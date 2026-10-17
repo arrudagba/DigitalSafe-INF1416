@@ -1,0 +1,14 @@
+Pacote de teste do Cofre Digital (gerado por GeradorPacote)
+
+Usuario   Certificado              Chave privada                 Frase secreta
+admin     Keys/admin-x509.crt      Keys/admin-pkcs8-aes.key      admin
+user01    Keys/user01-x509.crt     Keys/user01-pkcs8-aes.key     user01
+user02    Keys/user02-x509.crt     Keys/user02-pkcs8-aes.key     user02
+
+Pasta segura: Files/
+  XXYYZZ00 docAdmin.txt            dono admin,  grupo administrador
+  XXYYZZ01 docUser01.txt           dono user01, grupo usuario (compartilhado com user02, id 1)
+  XXYYZZ02 docUser02.txt           dono user02, grupo usuario
+  XXYYZZ03 relatorioAdmin.txt      dono admin,  grupo administrador (compartilhado com user01, id 2)
+  XXYYZZ04 assinaturaInvalida.txt  dono user01: assinatura digital nao confere (falha de verificacao)
+  XXYYZZ05 envelopeInvalido.txt    dono user01: envelope gerado para o user02 (falha de decriptacao)

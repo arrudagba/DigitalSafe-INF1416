@@ -1,0 +1,4 @@
+build/
+dist/
+cofre.db
+cofre.db-*
