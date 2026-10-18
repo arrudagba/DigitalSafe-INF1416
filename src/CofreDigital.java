@@ -1,3 +1,6 @@
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.SQLException;
@@ -7,9 +10,6 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.*;
 
-//
-// Cofre Digital (Digital Vault): interface grafica. Toda a logica e os registros
-// ficam no Sistema; esta classe apenas apresenta as telas.
 @SuppressWarnings("serial")
 public class CofreDigital extends JFrame {
 
@@ -19,10 +19,8 @@ public class CofreDigital extends JFrame {
     private final Sistema sistema;
     private final JPanel conteudo = new JPanel(new BorderLayout());
 
-    // estado da Tela de Cadastro (formulario preenchido em caso de erro)
     private Cadastro.Formulario formularioAnterior;
 
-    // estado da Tela de Consultar
     private Consulta.Listagem listagem;
 
     public static void main(String[] args) {
@@ -54,10 +52,6 @@ public class CofreDigital extends JFrame {
         setSize(820, 640);
         setLocationRelativeTo(null);
     }
-
-    // =====================================================================
-    // Processo de partida
-    // =====================================================================
 
     void partida() throws SQLException {
         setVisible(true);
@@ -94,10 +88,6 @@ public class CofreDigital extends JFrame {
         dispose();
         System.exit(0);
     }
-
-    // =====================================================================
-    // Autenticacao
-    // =====================================================================
 
     private void iniciarAutenticacao() {
         sistema.iniciarAutenticacao();
@@ -190,7 +180,7 @@ public class CofreDigital extends JFrame {
                 todos.addAll(Arrays.asList(apagar, limpar, verificar));
                 habilitar(todos, false);
                 verificar.setText("Verificando...");
-                // a verificacao testa as combinacoes dos pares com bcrypt: fora da thread da interface
+                // bcrypt fora da thread da interface
                 new SwingWorker<Autenticacao.Resultado, Void>() {
                     protected Autenticacao.Resultado doInBackground() throws Exception {
                         return sistema.getAutenticacao().verificarSenha(pares);
@@ -279,10 +269,6 @@ public class CofreDigital extends JFrame {
         mostrar(painel(titulo("Autenticação – Etapa 3 de 3: token"), corpo, botoes(verificar)), token);
     }
 
-    // =====================================================================
-    // Tela Principal
-    // =====================================================================
-
     private void telaPrincipal() {
         rodar(new Acao() {
             public void executar() throws Exception {
@@ -319,10 +305,6 @@ public class CofreDigital extends JFrame {
             }
         });
     }
-
-    // =====================================================================
-    // Tela de Cadastro (opcao 1 e cadastro do administrador na partida)
-    // =====================================================================
 
     private void telaCadastro(final boolean partida) {
         rodar(new Acao() {
@@ -445,7 +427,6 @@ public class CofreDigital extends JFrame {
                     qrCode(conf.uriOtpAuth)},
                     "Cadastro efetivado", JOptionPane.INFORMATION_MESSAGE);
                 if (partida) {
-                    // a frase secreta do administrador fica em memoria durante a execucao
                     sistema.definirFraseAdministrador(f.fraseSecreta);
                     f.apagar();
                     iniciarAutenticacao();
@@ -457,10 +438,6 @@ public class CofreDigital extends JFrame {
             }
         });
     }
-
-    // =====================================================================
-    // Tela de Consultar Pasta de Arquivos Secretos do Usuario
-    // =====================================================================
 
     private void telaConsulta() {
         rodar(new Acao() {
@@ -585,10 +562,6 @@ public class CofreDigital extends JFrame {
         }
     }
 
-    // =====================================================================
-    // Tela de Saida
-    // =====================================================================
-
     private void telaSaida() {
         rodar(new Acao() {
             public void executar() throws Exception {
@@ -635,10 +608,6 @@ public class CofreDigital extends JFrame {
         });
     }
 
-    // =====================================================================
-    // Componentes
-    // =====================================================================
-
     private JComponent cabecalho(Usuario u) {
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
@@ -648,8 +617,6 @@ public class CofreDigital extends JFrame {
         return p;
     }
 
-    //
-    // tela dividida em cabecalho, corpo 1 e corpo 2
     private static JPanel painel(JComponent cabecalho, JComponent corpo1, JComponent corpo2) {
         JPanel p = new JPanel(new BorderLayout(0, 12));
         JPanel topo = new JPanel();
@@ -743,8 +710,6 @@ public class CofreDigital extends JFrame {
         return f;
     }
 
-    //
-    // limita a quantidade de caracteres de um campo
     private static void limitar(JTextComponent campo, final int limite) {
         ((AbstractDocument) campo.getDocument()).setDocumentFilter(new DocumentFilter() {
             public void insertString(FilterBypass fb, int pos, String texto, AttributeSet a) throws BadLocationException {
@@ -763,8 +728,6 @@ public class CofreDigital extends JFrame {
         });
     }
 
-    //
-    // campo de caminho com botao para escolher o arquivo ou a pasta
     private JComponent comArquivo(final JTextField campo, final boolean pasta) {
         JPanel p = new JPanel(new BorderLayout(6, 0));
         p.add(campo, BorderLayout.CENTER);
@@ -783,8 +746,6 @@ public class CofreDigital extends JFrame {
         return p;
     }
 
-    //
-    // QRCode da URI otpauth para o Google Authenticator (se falhar, fica so a chave em texto)
     private static JComponent qrCode(String uri) {
         try {
             JLabel qr = new JLabel(new ImageIcon(QRCodeOtp.gerar(uri, 260)));

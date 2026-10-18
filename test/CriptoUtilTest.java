@@ -1,3 +1,6 @@
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 import static org.junit.Assert.*;
 
 import java.io.File;
@@ -8,9 +11,6 @@ import java.security.cert.X509Certificate;
 import javax.crypto.SecretKey;
 import org.junit.*;
 
-//
-// Rotinas criptograficas: chave AES (SHA1PRNG), chave privada, certificado,
-// envelope digital e assinatura digital
 public class CriptoUtilTest {
 
     private static GeradorPacote.Pacote p;

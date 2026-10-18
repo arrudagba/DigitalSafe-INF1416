@@ -1,11 +1,12 @@
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 import static org.junit.Assert.*;
 
 import java.lang.reflect.Field;
 import java.util.*;
 import org.junit.*;
 
-//
-// Processo de autenticacao em tres etapas, com contagem de erros e bloqueio de 2 minutos
 public class AutenticacaoTest {
 
     private static final String ADMIN  = GeradorPacote.ADMIN;
@@ -27,10 +28,6 @@ public class AutenticacaoTest {
     public void depois() throws Exception {
         c.close();
     }
-
-    // =====================================================================
-    // Etapa 1: identificacao
-    // =====================================================================
 
     @Test
     public void inicioDaAutenticacaoRegistra2001() throws Exception {
@@ -73,10 +70,6 @@ public class AutenticacaoTest {
     public void loginNameNaoDiferenciaMaiusculasEEspacos() throws Exception {
         assertEquals(Autenticacao.Resultado.LIBERADO, a.identificar("  USER01@INF1416.puc-rio.br "));
     }
-
-    // =====================================================================
-    // Etapa 2: senha pessoal
-    // =====================================================================
 
     @Test
     public void senhaCorretaSegueParaAEtapa3() throws Exception {
@@ -128,10 +121,6 @@ public class AutenticacaoTest {
         a.verificarSenha(Cenario.digitar("13572468"));
         assertEquals(Cenario.lista(Mensagens.SENHA_ERRO2), c.mids(m));
     }
-
-    // =====================================================================
-    // Etapa 3: token TOTP
-    // =====================================================================
 
     @Test
     public void tokenCorretoPermiteAcessoEIniciaASessao() throws Exception {
@@ -201,10 +190,6 @@ public class AutenticacaoTest {
         assertArrayEquals(new char[senha.length], senha);
     }
 
-    // =====================================================================
-    // Bloqueio
-    // =====================================================================
-
     @Test
     public void outrosUsuariosPodemEntrarDuranteOBloqueio() throws Exception {
         a.identificar(USER01);
@@ -232,10 +217,6 @@ public class AutenticacaoTest {
         a.identificar(USER01);
         a.verificarToken("123456");
     }
-
-    // =====================================================================
-    // Auxiliares
-    // =====================================================================
 
     private void assertBloqueioDe2Minutos(String login) throws Exception {
         int m = c.marca();

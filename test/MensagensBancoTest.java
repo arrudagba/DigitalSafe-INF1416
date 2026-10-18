@@ -1,11 +1,12 @@
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 import static org.junit.Assert.*;
 
 import java.sql.*;
 import java.util.*;
 import org.junit.*;
 
-//
-// Tabela de Mensagens de Registro e estrutura do banco de dados
 public class MensagensBancoTest {
 
     private Cenario c;

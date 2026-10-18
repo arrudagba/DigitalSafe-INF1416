@@ -1,11 +1,11 @@
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 import java.security.cert.X509Certificate;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.function.LongSupplier;
 
-//
-// Nucleo do Cofre Digital (sem interface grafica): processo de partida, frase
-// secreta do administrador em memoria, sessao do usuario e registros das telas
 public class Sistema implements AutoCloseable {
 
     public enum Partida { CADASTRO_ADMINISTRADOR, OPERACAO_NORMAL }
@@ -39,10 +39,6 @@ public class Sistema implements AutoCloseable {
     public Consulta getConsulta()         { return consulta; }
     public Usuario getUsuarioSessao()     { return usuarioSessao; }
 
-    // =====================================================================
-    // Processo de partida
-    // =====================================================================
-
     public Partida iniciar() throws SQLException {
         log.registrar(Mensagens.SISTEMA_INICIADO);
         if (banco.totalUsuarios() == 0) {
@@ -53,9 +49,6 @@ public class Sistema implements AutoCloseable {
         return Partida.OPERACAO_NORMAL;
     }
 
-    //
-    // segunda partida em diante: valida a frase secreta da chave privada do
-    // administrador da mesma forma que no cadastro e a mantem em memoria
     public boolean validarFraseAdministrador(char[] frase) throws SQLException {
         Usuario admin = banco.administradorDoSistema();
         if (admin == null || frase == null) {
@@ -75,8 +68,6 @@ public class Sistema implements AutoCloseable {
         return true;
     }
 
-    //
-    // primeira partida: a frase secreta usada no cadastro do administrador fica em memoria
     public void definirFraseAdministrador(char[] frase) {
         apagarFraseAdministrador();
         fraseAdministrador = frase.clone();
@@ -91,16 +82,10 @@ public class Sistema implements AutoCloseable {
         autenticacao.iniciar();
     }
 
-    //
-    // chamado apos a autenticacao positiva (o registro 1003 eh feito pela Autenticacao)
     public void iniciarSessao() {
         usuarioSessao = autenticacao.getUsuario();
         autenticacao.limpar();
     }
-
-    // =====================================================================
-    // Telas (registros das operacoes)
-    // =====================================================================
 
     public void telaPrincipal()            { log.registrar(Mensagens.TELA_PRINCIPAL, usuarioSessao); }
     public void opcaoCadastrar()           { log.registrar(Mensagens.MENU_OPCAO1, usuarioSessao); }
@@ -113,16 +98,12 @@ public class Sistema implements AutoCloseable {
     public void telaSaida()                { log.registrar(Mensagens.TELA_SAIDA, usuarioSessao); }
     public void voltarDeSair()             { log.registrar(Mensagens.BOTAO_VOLTAR_SAIDA, usuarioSessao); }
 
-    //
-    // Botao Encerrar Sessao: encerra a sessao e reinicia a autenticacao
     public void encerrarSessao() {
         log.registrar(Mensagens.BOTAO_ENCERRAR_SESSAO, usuarioSessao);
         finalizarSessao();
         iniciarAutenticacao();
     }
 
-    //
-    // Botao Encerrar Sistema
     public void botaoEncerrarSistema() {
         log.registrar(Mensagens.BOTAO_ENCERRAR_SISTEMA, usuarioSessao);
         encerrar();
@@ -135,8 +116,6 @@ public class Sistema implements AutoCloseable {
         }
     }
 
-    //
-    // encerra a execucao: apaga a frase secreta da memoria e registra 1002
     public void encerrar() {
         if (encerrado) {
             return;
@@ -155,16 +134,10 @@ public class Sistema implements AutoCloseable {
         }
     }
 
-    // =====================================================================
-    // Dados das telas
-    // =====================================================================
-
     public int totalUsuarios() throws SQLException {
         return banco.totalUsuarios();
     }
 
-    //
-    // recarrega os contadores (acessos e consultas) do usuario da sessao
     public Usuario atualizarUsuarioSessao() throws SQLException {
         if (usuarioSessao != null) {
             usuarioSessao = banco.buscarUsuario(usuarioSessao.uid);

@@ -1,14 +1,12 @@
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 import java.io.*;
 import java.security.cert.X509Certificate;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-//
-// Programa de apoio (auditoria) que apresenta os registros do Cofre Digital em
-// ordem cronologica. Apenas o administrador pode executa-lo: a autenticacao usa a
-// chave privada (caminho na linha de comando), a frase secreta digitada sem echo
-// e a assinatura digital de um array aleatorio de 2048 bytes.
 public class LogView {
 
     public static void main(String[] args) {
@@ -52,9 +50,6 @@ public class LogView {
         System.exit(codigo);
     }
 
-    //
-    // autentica o administrador: a chave privada deve ser decriptada com a frase
-    // secreta e corresponder ao certificado digital de um administrador cadastrado
     static Usuario autenticar(Banco banco, String caminhoChave, char[] frase) throws SQLException {
         byte[] chaveCifrada = CriptoUtil.lerArquivo(caminhoChave);
         if (chaveCifrada == null) {
@@ -78,8 +73,6 @@ public class LogView {
         return null;
     }
 
-    //
-    // mensagens de log (data, hora, codigo e texto) em ordem cronologica
     static void imprimir(Banco banco, PrintStream out) throws SQLException {
         SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS");
         List<Banco.Registro> registros = banco.registrosCronologicos();

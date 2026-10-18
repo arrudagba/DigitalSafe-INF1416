@@ -1,3 +1,6 @@
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 import static org.junit.Assert.*;
 
 import java.io.File;
@@ -7,9 +10,6 @@ import java.sql.*;
 import java.util.*;
 import org.junit.*;
 
-//
-// Cadastro de usuarios: criticas do formulario (6003 a 6007), confirmacao (6008 e
-// 6009) e armazenamento (Usuarios / Chaveiro, bcrypt, chave TOTP cifrada)
 public class CadastroTest {
 
     private Cenario c;
@@ -28,10 +28,6 @@ public class CadastroTest {
     public void depois() throws Exception {
         c.close();
     }
-
-    // =====================================================================
-    // Criticas do formulario
-    // =====================================================================
 
     @Test
     public void senhaPessoalInvalidaRegistra6003() throws Exception {
@@ -97,10 +93,6 @@ public class CadastroTest {
         assertFalha(f, Cadastro.Status.CHAVE_ASSINATURA_INVALIDA, Mensagens.CHAVE_ASSINATURA_INVALIDA);
     }
 
-    // =====================================================================
-    // Confirmacao e armazenamento
-    // =====================================================================
-
     @Test
     public void telaDeConfirmacaoApresentaOsCamposDoCertificado() throws Exception {
         Cadastro.Preparacao prep = preparar(p.user01, Cenario.SENHA_USER01);
@@ -144,7 +136,7 @@ public class CadastroTest {
             String pem = rs.getString("certificado_pem");
             assertTrue(pem.startsWith("-----BEGIN CERTIFICATE-----"));
             assertEquals(p.user01.certificado, CriptoUtil.certificadoDePem(pem));
-            // chave privada no formato criptografado (binario), igual ao arquivo
+            // chave privada cifrada (binario)
             assertArrayEquals(Files.readAllBytes(p.user01.arquivoChave.toPath()), rs.getBytes("chave_privada"));
         }
         assertNotEquals(admin.getKid(), u.getKid());
@@ -231,10 +223,6 @@ public class CadastroTest {
         assertEquals(Mensagens.CADASTRO_SENHA_INVALIDA, r[0]);
         assertEquals(admin.getUid(), r[1]);
     }
-
-    // =====================================================================
-    // Auxiliares
-    // =====================================================================
 
     private Cadastro.Preparacao preparar(GeradorPacote.Identidade id, String senha) throws Exception {
         return c.sistema.getCadastro().preparar(c.formulario(id, senha, Usuario.GID_USUARIO), admin);

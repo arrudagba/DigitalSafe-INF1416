@@ -1,3 +1,6 @@
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -7,12 +10,8 @@ import java.sql.SQLException;
 import java.text.Normalizer;
 import java.util.*;
 
-//
-// Consulta da pasta de arquivos secretos do usuario
 public class Consulta {
 
-    //
-    // arquivo da pasta segura que o usuario pode visualizar
     public static class Entrada {
         public enum Acesso { DONO, COMPARTILHADO, GRUPO }
 
@@ -91,17 +90,12 @@ public class Consulta {
         this.log = log;
     }
 
-    //
-    // Botao Listar: valida a frase secreta do usuario, decripta e verifica os
-    // arquivos index e share (protegidos com as chaves do administrador) e lista
-    // os arquivos que o usuario pode acessar
     public Listagem listar(Usuario usuario, String caminhoPasta, char[] fraseUsuario, char[] fraseAdministrador)
             throws SQLException {
         log.registrar(Mensagens.BOTAO_LISTAR, usuario);
         banco.incrementarConsultas(usuario.uid);
         usuario.totalConsultas++;
 
-        // frase secreta validada da mesma forma que no cadastro do usuario
         CriptoUtil.ResultadoChave chaveUsuario = validarChave(usuario, fraseUsuario);
         if (chaveUsuario.status == CriptoUtil.StatusChave.FRASE_INVALIDA
                 || chaveUsuario.status == CriptoUtil.StatusChave.CAMINHO_INVALIDO) {
@@ -141,7 +135,7 @@ public class Consulta {
         }
         log.registrar(Mensagens.INDICE_VERIFICADO, usuario);
 
-        // arquivo de compartilhamento: em caso de falha, lista apenas os arquivos do indice
+        // falha no share: lista apenas o indice
         String avisoShare = null;
         byte[] share = null;
         try {
@@ -170,9 +164,6 @@ public class Consulta {
         return new Listagem(StatusListagem.OK, null, entradas, avisoShare, pasta, chaveUsuario.chave);
     }
 
-    //
-    // politica de controle de acesso: arquivos que o usuario eh dono, arquivos do
-    // seu grupo e arquivos compartilhados com ele pelos respectivos donos
     static List<Entrada> filtrar(Usuario usuario, List<String[]> indice, List<String[]> share) {
         List<Entrada> entradas = new ArrayList<Entrada>();
         for (String[] linha : indice) {
@@ -201,9 +192,6 @@ public class Consulta {
         return null;
     }
 
-    //
-    // compara o grupo do arquivo com o grupo do usuario, sem diferenciar
-    // maiusculas/minusculas e acentos (ex.: "usuario" e "Usuário")
     static boolean mesmoGrupo(String grupoArquivo, String grupoUsuario) {
         return normalizar(grupoArquivo).equals(normalizar(grupoUsuario));
     }
@@ -213,9 +201,6 @@ public class Consulta {
                          .replaceAll("\\p{M}", "").toLowerCase(Locale.ROOT);
     }
 
-    //
-    // nome secreto selecionado: decripta o arquivo e grava os dados decriptados em
-    // um novo arquivo com o nome secreto
     public ResultadoArquivo decriptar(Usuario usuario, Listagem listagem, Entrada entrada) throws SQLException {
         log.registrar(Mensagens.ARQUIVO_SELECIONADO, usuario, entrada.nomeSecreto);
         if (entrada.acesso == Entrada.Acesso.GRUPO || !nomeSeguro(entrada.nomeSecreto)) {
@@ -240,7 +225,7 @@ public class Consulta {
                 "Falha na decriptação do arquivo " + entrada.nomeSecreto + " (sigilo).", null);
         }
 
-        // a assinatura digital do arquivo eh gerada com a chave privada do dono
+        // assinado pelo dono do arquivo
         Usuario dono = banco.buscarUsuario(entrada.dono);
         PublicKey publicaDono = dono == null ? null : chavePublica(dono);
         if (publicaDono == null
@@ -264,9 +249,6 @@ public class Consulta {
             "Arquivo " + entrada.nomeSecreto + " decriptado e gravado em " + destino.getPath() + ".", destino);
     }
 
-    //
-    // envelope do arquivo compartilhado: nome codigo + identificador do
-    // compartilhamento + extensao .shr (aceita os separadores mais comuns)
     private static byte[] lerEnvelopeCompartilhado(File pasta, String codigo, String id) throws IOException {
         for (String separador : new String[] {"", "_", "-", "."}) {
             File arquivo = new File(pasta, codigo + separador + id + ".shr");
@@ -277,8 +259,6 @@ public class Consulta {
         throw new FileNotFoundException("Envelope .shr do compartilhamento " + id + " de " + codigo);
     }
 
-    //
-    // o nome secreto vem do indice: nao pode conter caminho (evita gravar fora da pasta)
     private static boolean nomeSeguro(String nome) {
         return !nome.isEmpty() && new File(nome).getName().equals(nome) && !nome.equals("..") && !nome.equals(".");
     }
@@ -322,8 +302,6 @@ public class Consulta {
         return Files.readAllBytes(new File(pasta, nome).toPath());
     }
 
-    //
-    // linhas do arquivo decriptado, separadas em campos por espaco
     static List<String[]> linhas(byte[] conteudo) {
         List<String[]> linhas = new ArrayList<String[]>();
         for (String linha : new String(conteudo, StandardCharsets.UTF_8).split("\r?\n")) {

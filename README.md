@@ -44,13 +44,13 @@ lib/            bibliotecas
 
 ## Compilação
 
-Linux/macOS:
+Linux/macOS (precisa do `make`):
 
 ```bash
-./compilar.sh
+make
 ```
 
-O script compila `src/`, `ferramentas/` e `test/` e gera dois JARs:
+Compila `src/`, `ferramentas/` e `test/` e gera dois JARs. Só recompila o que mudou:
 
 - `dist/CofreDigital.jar`: o Cofre Digital
 - `dist/LogView.jar`: o programa de auditoria, que **não contém** as classes do cofre
@@ -64,10 +64,27 @@ java -cp "build/classes:lib/*" CofreDigital
 java -cp "build/classes:lib/*" LogView pacote/Keys/admin-pkcs8-aes.key
 ```
 
+### Comandos do Makefile
+
+| Comando | O que faz |
+|---|---|
+| `make` | compila tudo e gera os JARs |
+| `make run` | executa o Cofre Digital (`make run DB=outro.db` usa outro banco) |
+| `make run-linux` | igual ao `run`, com `GDK_SCALE=2 GDK_DPI_SCALE=1` (telas HiDPI no Linux) |
+| `make test` | executa os testes automatizados |
+| `make logview` | executa o LogView com `pacote/Keys/admin-pkcs8-aes.key` (`CHAVE=...` e `DB=...` opcionais) |
+| `make token SEGREDO=<BASE32>` | mostra o código TOTP atual de uma chave |
+| `make pacote` | regenera o pacote de teste (`PASTA=...` opcional) |
+| `make clean` | apaga `build/` e `dist/` |
+| `make clean-db` | apaga o banco `cofre.db` |
+
+O modo Linux é `make run-linux`, e não `make run --linux`, porque o `make` trata `--linux` como
+uma opção dele mesmo e termina com erro.
+
 ## Testes automatizados
 
 ```bash
-./testar.sh
+make test
 ```
 
 São 143 testes, que levam cerca de 30 s e não precisam de interface gráfica. Cada teste cria
@@ -92,7 +109,8 @@ testar o bloqueio de 2 minutos sem esperar.
 A pasta `pacote/` já vem pronta. Para regenerá-la (as chaves mudam a cada geração):
 
 ```bash
-./gerar_pacote.sh
+make pacote
+make clean-db
 ```
 
 | Usuário | Certificado | Chave privada | Frase secreta |
@@ -124,8 +142,8 @@ Senhas pessoais sugeridas: admin `13572468`, user01 `24681357`, user02 `97531864
 ### 1. Primeira execução: cadastro do administrador
 
 ```bash
-rm -f cofre.db cofre.db-*      # começa do zero
-./cofre.sh                     # ou: java -jar dist/CofreDigital.jar [caminho_do_banco]
+make clean-db                  # começa do zero
+make run                       # ou: make run-linux
 ```
 
 Sem usuários cadastrados, o sistema abre o cadastro do administrador (registro 1005):
@@ -140,7 +158,7 @@ Sem usuários cadastrados, o sistema abre o cadastro do administrador (registro 
 3. O sistema mostra o **QRCode**, a **chave secreta TOTP em BASE32** e a URI `otpauth://...`.
    No Google Authenticator, toque em **+ → Ler QR code** e aponte para a tela. Outra opção é
    "Inserir chave de configuração" com a chave BASE32, tipo "Baseada no horário".
-   Sem celular, use `./token.sh <CHAVE_BASE32>` para obter o código atual.
+   Sem celular, use `make token SEGREDO=<CHAVE_BASE32>` para obter o código atual.
 
 A frase secreta do administrador fica em memória e o sistema segue para a autenticação.
 
@@ -149,7 +167,7 @@ A frase secreta do administrador fica em memória e o sistema segue para a auten
 1. **Etapa 1:** digite `admin@inf1416.puc-rio.br`.
 2. **Etapa 2:** digite `13572468` no teclado virtual, clicando no botão que contém cada dígito.
    Os números mudam de botão a cada clique. Depois clique em **Verificar senha**.
-3. **Etapa 3:** digite o código de 6 dígitos do Google Authenticator (ou do `./token.sh`).
+3. **Etapa 3:** digite o código de 6 dígitos do Google Authenticator (ou do `make token`).
 
 ### 3. Menu principal (administrador)
 
@@ -184,7 +202,7 @@ minutos e voltam para a etapa 1. Outros usuários continuam podendo entrar.
 ### 6. Segunda execução em diante
 
 ```bash
-./cofre.sh
+make run                       # ou: make run-linux
 ```
 
 O sistema pede a frase secreta do administrador (`admin`). Com a frase errada, ele avisa e
@@ -193,7 +211,7 @@ encerra. Com a frase certa, segue para a autenticação.
 ### 7. LogView (auditoria, somente administrador)
 
 ```bash
-./logview.sh pacote/Keys/admin-pkcs8-aes.key            # usa ./cofre.db
+make logview                                  # chave do admin do pacote e ./cofre.db
 # ou: java -jar dist/LogView.jar <chave_privada> [caminho_do_banco]
 ```
 

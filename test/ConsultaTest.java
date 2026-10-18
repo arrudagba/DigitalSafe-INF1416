@@ -1,3 +1,6 @@
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 import static org.junit.Assert.*;
 
 import java.io.File;
@@ -6,9 +9,6 @@ import java.nio.file.*;
 import java.util.*;
 import org.junit.*;
 
-//
-// Consulta da pasta de arquivos secretos: index/share, politica de controle de
-// acesso e decriptacao dos arquivos (7003 a 7021)
 public class ConsultaTest {
 
     private static final String ADMIN  = GeradorPacote.ADMIN;
@@ -29,10 +29,6 @@ public class ConsultaTest {
     public void depois() throws Exception {
         c.close();
     }
-
-    // =====================================================================
-    // Listagem e politica de controle de acesso
-    // =====================================================================
 
     @Test
     public void listagemRegistraDecriptacaoEVerificacaoDoIndexEDoShare() throws Exception {
@@ -144,7 +140,7 @@ public class ConsultaTest {
         assertNotNull(l.avisoShare);
         assertEquals(Cenario.lista(Mensagens.BOTAO_LISTAR, Mensagens.INDICE_DECRIPTADO, Mensagens.INDICE_VERIFICADO,
                                    Mensagens.SHARE_FALHA_DECRIPTACAO, Mensagens.INDICE_LISTA_APRESENTADA), c.mids(m));
-        // sem o share, o arquivo compartilhado pelo admin nao aparece
+        // sem o share, o arquivo do admin nao aparece
         assertEntradas(l, "docUser01.txt=DONO", "docUser02.txt=GRUPO",
                        "assinaturaInvalida.txt=DONO", "envelopeInvalido.txt=DONO");
     }
@@ -162,10 +158,6 @@ public class ConsultaTest {
         assertEntradas(l, "docUser01.txt=GRUPO", "docUser02.txt=DONO",
                        "assinaturaInvalida.txt=GRUPO", "envelopeInvalido.txt=GRUPO");
     }
-
-    // =====================================================================
-    // Decriptacao dos arquivos secretos
-    // =====================================================================
 
     @Test
     public void arquivoDoDonoEhDecriptadoVerificadoEGravadoComONomeSecreto() throws Exception {
@@ -305,10 +297,6 @@ public class ConsultaTest {
         assertTrue(l.entradas.isEmpty());
     }
 
-    // =====================================================================
-    // Formato dos arquivos index e share
-    // =====================================================================
-
     @Test
     public void linhasDoIndiceSeparadasPorEspacoEFimDeLinha() {
         List<String[]> linhas = Consulta.linhas(texto("A B c@d.com usuario\r\n\nC D e@f.com administrador\n  \n"));
@@ -332,10 +320,6 @@ public class ConsultaTest {
         assertEquals(1, e.size());
         assertEquals("b.txt", e.get(0).nomeSecreto);
     }
-
-    // =====================================================================
-    // Auxiliares
-    // =====================================================================
 
     private Consulta.Listagem listar(String frase) throws Exception {
         Consulta.Listagem l = c.sistema.listar(pasta.getPath(), frase.toCharArray());
@@ -384,8 +368,6 @@ public class ConsultaTest {
         Files.write(arquivo, dados);
     }
 
-    //
-    // novo index/share protegidos com as chaves do administrador
     private void reescreverIndice(String index, String share) throws Exception {
         GeradorPacote.Pacote p = c.p();
         GeradorPacote.protegerArquivo(pasta, "index", texto(index), p.admin.par.getPublic(), p.admin.par.getPrivate());

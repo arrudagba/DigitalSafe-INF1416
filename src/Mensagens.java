@@ -1,8 +1,8 @@
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 import java.util.*;
 
-//
-// Tabela de Mensagens de Registro (anexo do enunciado). Os textos sao gravados
-// na tabela Mensagens do banco de dados; a tabela Registros guarda apenas o MID.
 public final class Mensagens {
 
     public static final int SISTEMA_INICIADO                 = 1001;
@@ -154,8 +154,6 @@ public final class Mensagens {
     private Mensagens() {
     }
 
-    //
-    // substitui <login_name> e <arq_name> no texto de uma mensagem
     public static String formatar(String texto, String loginName, String arqName) {
         String s = texto;
         s = s.replace(LOGIN_NAME, loginName != null ? loginName : "-");

@@ -1,3 +1,6 @@
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -16,15 +19,6 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
-//
-// Ferramenta de apoio (nao faz parte do Cofre Digital): gera o material de teste
-// no mesmo formato descrito no enunciado.
-//
-//   Keys/  - certificados X.509 (PEM) e chaves privadas PKCS8 em BASE64 cifradas
-//            com AES/ECB/PKCS5Padding (chave de 256 bits gerada com SHA1PRNG a
-//            partir da frase secreta)
-//   Files/ - pasta segura: index e share (protegidos com as chaves do
-//            administrador) e arquivos secretos (.enc, .env, .asd e .shr)
 public class GeradorPacote {
 
     public static final String ADMIN  = "admin@inf1416.puc-rio.br";
@@ -37,8 +31,6 @@ public class GeradorPacote {
 
     public static final String ASSINATURA = "SHA256withRSA";
 
-    //
-    // usuario do pacote de teste
     public static class Identidade {
         public final String prefixo, nome, email, frase;
         public KeyPair par;
@@ -105,18 +97,12 @@ public class GeradorPacote {
         return id;
     }
 
-    //
-    // chave privada PKCS8 em BASE64 (PEM), cifrada com a chave AES da frase secreta
     public static byte[] cifrarChavePrivada(PrivateKey privada, String frase) throws GeneralSecurityException {
         String pem = "-----BEGIN PRIVATE KEY-----\n"
                    + Base64.getMimeEncoder(64, "\n".getBytes(StandardCharsets.US_ASCII)).encodeToString(privada.getEncoded())
                    + "\n-----END PRIVATE KEY-----\n";
         return CriptoUtil.cifrarAES(CriptoUtil.chaveAES(frase.toCharArray()), pem.getBytes(StandardCharsets.US_ASCII));
     }
-
-    // =====================================================================
-    // Pasta segura
-    // =====================================================================
 
     private static void gerarPastaSegura(Pacote p) throws Exception {
         File f = p.files;
@@ -130,10 +116,10 @@ public class GeradorPacote {
         byte[] s03 = protegerArquivo(f, "XXYYZZ03", texto("Relatorio do administrador compartilhado com o user01."),
                                      adm, p.admin.par.getPrivate());
         criarEnvelope(new File(f, "XXYYZZ03_2.shr"), s03, u1);
-        // assinatura digital de outro conteudo: falha de integridade/autenticidade
+        // assinatura de outro conteudo
         protegerArquivo(f, "XXYYZZ04", texto("Conteudo original do user01."), u1, p.user01.par.getPrivate());
         escrever(new File(f, "XXYYZZ04.asd"), assinar(texto("Conteudo adulterado."), p.user01.par.getPrivate()));
-        // envelope digital gerado para outro usuario: falha de decriptacao (sigilo)
+        // envelope para outro usuario
         protegerArquivo(f, "XXYYZZ05", texto("Arquivo com envelope invalido."), u2, p.user01.par.getPrivate());
 
         String index = "XXYYZZ00 docAdmin.txt " + ADMIN + " administrador\n"
@@ -148,10 +134,6 @@ public class GeradorPacote {
         protegerArquivo(f, "share", texto(share), adm, p.admin.par.getPrivate());
     }
 
-    //
-    // gera nome.enc (AES/ECB/PKCS5Padding com chave gerada por SHA1PRNG a partir de
-    // uma semente aleatoria), nome.env (semente cifrada com a chave publica do
-    // destinatario) e nome.asd (assinatura digital do conteudo); retorna a semente
     public static byte[] protegerArquivo(File pasta, String nome, byte[] conteudo, PublicKey destinatario,
                                          PrivateKey assinante) throws Exception {
         byte[] semente = new byte[32];
@@ -174,10 +156,6 @@ public class GeradorPacote {
         sig.update(conteudo);
         return sig.sign();
     }
-
-    // =====================================================================
-    // Certificados (BouncyCastle PKIX)
-    // =====================================================================
 
     private static KeyPair novoPar() throws GeneralSecurityException {
         KeyPairGenerator gerador = KeyPairGenerator.getInstance("RSA");
@@ -208,10 +186,6 @@ public class GeradorPacote {
         return new JcaX509CertificateConverter().getCertificate(
             builder.build(new JcaContentSignerBuilder("SHA256withRSA").build(emissor.par.getPrivate())));
     }
-
-    // =====================================================================
-    // Auxiliares
-    // =====================================================================
 
     private static void escreverLeiaMe(Pacote p) throws IOException {
         String s = "Pacote de teste do Cofre Digital (gerado por GeradorPacote)\n\n"

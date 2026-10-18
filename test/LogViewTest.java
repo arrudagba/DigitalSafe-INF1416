@@ -1,12 +1,12 @@
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 import static org.junit.Assert.*;
 
 import java.io.*;
 import java.util.*;
 import org.junit.*;
 
-//
-// Programa de apoio logView: autenticacao do administrador (chave privada, frase
-// secreta e array aleatorio de 2048 bytes) e registros em ordem cronologica
 public class LogViewTest {
 
     private Cenario c;
@@ -99,9 +99,8 @@ public class LogViewTest {
         assertTrue(texto, texto.contains(
             "7015    Arquivo doc.txt selecionado por user01@inf1416.puc-rio.br para decriptação."));
         assertTrue(texto, texto.contains("2005    Login name intruso@exemplo.com não identificado."));
-        // registros sem usuario identificado (cadastro na partida do sistema)
+        // registros sem usuario (partida)
         assertTrue(texto, texto.contains("6002    Botão cadastrar pressionado por -."));
-        // a ordem da saida segue a ordem cronologica
         assertTrue(texto.indexOf("1001    ") < texto.indexOf("1003    "));
         assertTrue(texto.indexOf("1003    ") < texto.indexOf("7015    "));
     }

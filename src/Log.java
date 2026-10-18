@@ -1,9 +1,9 @@
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 import java.sql.SQLException;
 import java.util.function.LongSupplier;
 
-//
-// Registro das operacoes do sistema na tabela Registros (data/hora, MID, usuario
-// corrente e arquivo selecionado). O texto das mensagens fica na tabela Mensagens.
 public class Log {
 
     private final Banco banco;
@@ -26,8 +26,6 @@ public class Log {
         gravar(mid, usuario, null, arquivo);
     }
 
-    //
-    // login name informado que nao corresponde a um usuario cadastrado
     public void registrar(int mid, String loginName) {
         gravar(mid, null, loginName, null);
     }

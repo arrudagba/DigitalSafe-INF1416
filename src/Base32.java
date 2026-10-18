@@ -1,14 +1,9 @@
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 import java.io.*;
 
-/**
- * Routines for converting between Strings of Base32-encoded data and arrays
- * of binary data. This currently supports the Base32 and Base32hex alphabets
- * specified in RFC 4648, sections 6 and 7.
- *
- * @author Brian Wellington
- */
-
-// Classe fornecida no anexo do enunciado (mantida sem alteracoes de logica).
+// classe fornecida no enunciado
 public class Base32 {
 
     public static class Alphabet {
@@ -23,13 +18,6 @@ public class Base32 {
     private String alphabet;
     private boolean padding, lowercase;
 
-    /**
-     * Creates an object that can be used to do Base32 conversions.
-     * @param alphabet Which alphabet should be used
-     * @param padding Whether padding should be used
-     * @param lowercase Whether lowercase characters should be used.
-     * default parameters (The standard Base32 alphabet, no padding, uppercase)
-     */
     public
     Base32(String alphabet, boolean padding, boolean lowercase) {
         this.alphabet = alphabet;
@@ -73,12 +61,6 @@ public class Base32 {
         }
     }
 
-    /**
-     * Convert binary data to a Base32-encoded String
-     *
-     * @param b An array containing binary data
-     * @return A String containing the encoded data
-     */
     public String
     toString(byte [] b) {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -135,12 +117,6 @@ public class Base32 {
         return new String(os.toByteArray());
     }
 
-    /**
-     * Convert a Base32-encoded String to binary data
-     *
-     * @param str A String containing the encoded data
-     * @return An array containing the binary data, or null if the string is invalid
-     */
     public byte[]
     fromString(String str) {
         ByteArrayOutputStream bs = new ByteArrayOutputStream();

@@ -1,17 +1,15 @@
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 import java.sql.*;
 import java.util.*;
 
-//
-// Banco de dados relacional (SQLite) do Cofre Digital, com as tabelas Usuarios,
-// Chaveiro, Grupos, Mensagens e Registros
 public class Banco implements AutoCloseable {
 
     public static final String ARQUIVO_PADRAO = "cofre.db";
 
     private final Connection con;
 
-    //
-    // linha da tabela Registros com o texto da mensagem obtido da tabela Mensagens
     public static class Registro {
         public final int rid;
         public final long dataHora;
@@ -49,7 +47,7 @@ public class Banco implements AutoCloseable {
     }
 
     private void criarEsquema() throws SQLException {
-        // criacao das tabelas e carga de Grupos/Mensagens em uma unica transacao
+        // esquema criado em uma unica transacao
         con.setAutoCommit(false);
         try {
             criarTabelas();
@@ -118,10 +116,6 @@ public class Banco implements AutoCloseable {
         return con;
     }
 
-    // =====================================================================
-    // Usuarios e Chaveiro
-    // =====================================================================
-
     public int totalUsuarios() throws SQLException {
         try (Statement st = con.createStatement();
              ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM Usuarios")) {
@@ -151,8 +145,6 @@ public class Banco implements AutoCloseable {
         }
     }
 
-    //
-    // administrador do sistema: o primeiro administrador cadastrado (partida do sistema)
     public Usuario administradorDoSistema() throws SQLException {
         try (PreparedStatement ps = con.prepareStatement(SELECT_USUARIO + " WHERE u.gid = ? ORDER BY u.uid LIMIT 1")) {
             ps.setInt(1, Usuario.GID_ADMINISTRADOR);
@@ -207,9 +199,6 @@ public class Banco implements AutoCloseable {
         }
     }
 
-    //
-    // inclui o usuario e o seu par certificado digital / chave privada (KID) no
-    // Chaveiro, guardando o KID no registro do usuario
     public int inserirUsuario(String nome, String loginName, int gid, String senhaBcrypt, byte[] chaveTotpCifrada,
                               String certificadoPem, byte[] chavePrivadaCifrada) throws SQLException {
         boolean autoCommit = con.getAutoCommit();
@@ -311,10 +300,6 @@ public class Banco implements AutoCloseable {
         }
     }
 
-    // =====================================================================
-    // Registros
-    // =====================================================================
-
     public void registrar(long dataHora, int mid, Integer uid, String loginName, String arquivo) throws SQLException {
         try (PreparedStatement ps = con.prepareStatement(
                 "INSERT INTO Registros (data_hora, mid, uid, login_name, arquivo) VALUES (?, ?, ?, ?, ?)")) {
@@ -331,9 +316,6 @@ public class Banco implements AutoCloseable {
         }
     }
 
-    //
-    // registros em ordem cronologica, com o texto vindo da tabela Mensagens e o
-    // login name vindo da tabela Usuarios (ou o login informado nao identificado)
     public List<Registro> registrosCronologicos() throws SQLException {
         List<Registro> lista = new ArrayList<Registro>();
         String sql = "SELECT r.rid, r.data_hora, r.mid, m.texto, COALESCE(u.login_name, r.login_name) AS login, r.arquivo"

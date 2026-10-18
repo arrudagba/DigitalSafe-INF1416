@@ -1,3 +1,6 @@
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 import java.io.File;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -7,14 +10,10 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-//
-// Cadastro de usuarios (Tela de Cadastro e cadastro do administrador na partida)
 public class Cadastro {
 
     public static final int TAMANHO_CAMPO = 255;
 
-    //
-    // dados do Formulario de Cadastro
     public static class Formulario {
         public String caminhoCertificado;
         public String caminhoChavePrivada;
@@ -39,8 +38,6 @@ public class Cadastro {
         CHAVE_ASSINATURA_INVALIDA
     }
 
-    //
-    // resultado do Botao Cadastrar: erro ou dados do certificado para a tela de confirmacao
     public static class Preparacao {
         public final Status status;
         public final String mensagem;
@@ -59,8 +56,6 @@ public class Cadastro {
             return status == Status.PRONTO_PARA_CONFIRMAR;
         }
 
-        //
-        // campos do certificado apresentados na tela de confirmacao
         public Map<String, String> dadosCertificado() {
             SimpleDateFormat f = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
             Map<String, String> d = new LinkedHashMap<String, String>();
@@ -103,9 +98,6 @@ public class Cadastro {
         this.log = log;
     }
 
-    //
-    // Botao Cadastrar: critica os campos, testa a frase secreta e verifica a chave
-    // privada com a assinatura de um array aleatorio de 10240 bytes
     public Preparacao preparar(Formulario f, Usuario operador) throws SQLException {
         log.registrar(Mensagens.BOTAO_CADASTRAR, operador);
 
@@ -162,8 +154,6 @@ public class Cadastro {
         return p;
     }
 
-    //
-    // dados confirmados: inclui o usuario somente se o login name for unico
     public Confirmacao confirmar(Preparacao p, Usuario operador) throws Exception {
         if (!p.ok()) {
             throw new IllegalArgumentException("Cadastro nao preparado: " + p.status);
@@ -174,8 +164,6 @@ public class Cadastro {
             if (banco.buscarUsuario(loginName) != null) {
                 return new Confirmacao(StatusConfirmacao.LOGIN_DUPLICADO, null, null, null);
             }
-            // chave secreta TOTP: 20 bytes aleatorios, codificados em BASE32 e
-            // cifrados com AES/ECB/PKCS5Padding e chave gerada a partir da senha pessoal
             byte[] segredo = new byte[20];
             new SecureRandom().nextBytes(segredo);
             String base32 = new Base32(Base32.Alphabet.BASE32, false, false).toString(segredo);
@@ -197,8 +185,6 @@ public class Cadastro {
         p.apagar();
     }
 
-    //
-    // otpauth://totp/Cofre%20Digital:<login>?secret=<BASE32>
     public static String uriOtpAuth(String loginName, String base32) {
         try {
             String conta = URLEncoder.encode(loginName, "UTF-8").replace("%40", "@");

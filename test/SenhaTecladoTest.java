@@ -1,15 +1,12 @@
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 import static org.junit.Assert.*;
 
 import java.util.*;
 import org.junit.*;
 
-//
-// Senha pessoal (regras e bcrypt) e teclado virtual numerico sobrecarregado
 public class SenhaTecladoTest {
-
-    // =====================================================================
-    // Regras de formacao da senha pessoal
-    // =====================================================================
 
     @Test
     public void senhasDeOitoNoveOuDezDigitosSaoValidas() {
@@ -40,10 +37,6 @@ public class SenhaTecladoTest {
         }
     }
 
-    // =====================================================================
-    // Armazenamento bcrypt
-    // =====================================================================
-
     @Test
     public void hashBcryptVersao2yCusto8Com60Caracteres() {
         String hash = Senha.gerarHash("13572468".toCharArray());
@@ -67,10 +60,6 @@ public class SenhaTecladoTest {
     public void verificarComHashInvalidoRetornaFalso() {
         assertFalse(Senha.verificar("nao-eh-bcrypt", "13572468".toCharArray()));
     }
-
-    // =====================================================================
-    // Verificacao a partir do teclado sobrecarregado
-    // =====================================================================
 
     @Test
     public void descobreASenhaAPartirDosParesPressionados() {
@@ -100,7 +89,7 @@ public class SenhaTecladoTest {
 
     @Test
     public void botaoComODigitoCorretoEmQualquerPosicaoDoParEhAceito() {
-        // o teclado sobrecarregado nao distingue os dois numeros de um mesmo botao
+        // o botao nao distingue os seus dois digitos
         String hash = Senha.gerarHash("24681357".toCharArray());
         assertArrayEquals("24681357".toCharArray(),
                           Senha.descobrir(hash, pares("24", "40", "68", "82", "19", "36", "58", "79")));
@@ -123,10 +112,6 @@ public class SenhaTecladoTest {
         String hash = Senha.gerarHash("246813579".toCharArray());
         assertNull(Senha.descobrir(hash, Cenario.digitar("24681357")));
     }
-
-    // =====================================================================
-    // Teclado virtual
-    // =====================================================================
 
     @Test
     public void cincoBotoesComDoisNumerosSemRepeticao() {

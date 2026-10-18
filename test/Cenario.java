@@ -1,3 +1,6 @@
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -6,9 +9,6 @@ import java.sql.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
-//
-// Cenario de teste: pacote de teste (gerado uma unica vez), banco de dados
-// temporario, relogio controlavel e atalhos para cadastro e autenticacao.
 class Cenario implements Closeable {
 
     static final String SENHA_ADMIN  = "13572468";
@@ -24,8 +24,6 @@ class Cenario implements Closeable {
     final Map<String, String> segredos = new HashMap<String, String>();
     final Map<String, String> senhas = new HashMap<String, String>();
 
-    //
-    // pacote de teste compartilhado por todos os testes (pasta temporaria)
     static synchronized GeradorPacote.Pacote pacote() throws Exception {
         if (pacote == null) {
             File destino = Files.createTempDirectory("pacote-cofre").toFile();
@@ -46,10 +44,6 @@ class Cenario implements Closeable {
     GeradorPacote.Pacote p() {
         return pacote;
     }
-
-    // =====================================================================
-    // Cadastro
-    // =====================================================================
 
     Cadastro.Formulario formulario(GeradorPacote.Identidade id, String senha, int gid) {
         Cadastro.Formulario f = new Cadastro.Formulario();
@@ -73,8 +67,6 @@ class Cenario implements Closeable {
         return c;
     }
 
-    //
-    // primeira partida (cadastro do administrador) + cadastro de user01 e user02
     void cadastrarTodos() throws Exception {
         assertEquals(Sistema.Partida.CADASTRO_ADMINISTRADOR, sistema.iniciar());
         Usuario admin = cadastrar(pacote.admin, SENHA_ADMIN, Usuario.GID_ADMINISTRADOR, null).usuario;
@@ -83,13 +75,6 @@ class Cenario implements Closeable {
         cadastrar(pacote.user02, SENHA_USER02, Usuario.GID_USUARIO, admin);
     }
 
-    // =====================================================================
-    // Autenticacao
-    // =====================================================================
-
-    //
-    // digita a senha no teclado virtual sobrecarregado: para cada digito, pressiona
-    // o botao que o contem na distribuicao atual
     static List<char[]> digitar(String senha) {
         TecladoVirtual teclado = new TecladoVirtual();
         for (char digito : senha.toCharArray()) {
@@ -108,8 +93,6 @@ class Cenario implements Closeable {
         return new TOTP(segredos.get(email), 30).generateCode();
     }
 
-    //
-    // autenticacao completa (etapas 1, 2 e 3) e inicio da sessao
     Usuario entrar(String email) throws Exception {
         Autenticacao a = sistema.getAutenticacao();
         sistema.iniciarAutenticacao();
@@ -120,10 +103,6 @@ class Cenario implements Closeable {
         return sistema.getUsuarioSessao();
     }
 
-    // =====================================================================
-    // Registros
-    // =====================================================================
-
     int marca() throws SQLException {
         try (Statement st = banco.getConexao().createStatement();
              ResultSet rs = st.executeQuery("SELECT COALESCE(MAX(rid), 0) FROM Registros")) {
@@ -131,8 +110,6 @@ class Cenario implements Closeable {
         }
     }
 
-    //
-    // MIDs registrados depois da marca, na ordem em que foram gravados
     List<Integer> mids(int marca) throws SQLException {
         List<Integer> mids = new ArrayList<Integer>();
         try (PreparedStatement ps = banco.getConexao().prepareStatement(
@@ -147,8 +124,6 @@ class Cenario implements Closeable {
         return mids;
     }
 
-    //
-    // ultimo registro: {mid, uid, login_name, arquivo}
     Object[] ultimoRegistro() throws SQLException {
         try (Statement st = banco.getConexao().createStatement();
              ResultSet rs = st.executeQuery(
@@ -164,8 +139,6 @@ class Cenario implements Closeable {
         return Arrays.asList(mids);
     }
 
-    //
-    // copia a pasta segura do pacote para uma pasta temporaria (os testes podem altera-la)
     File copiaPastaSegura() throws IOException {
         File destino = new File(dir, "Files-" + System.nanoTime());
         assertTrue(destino.mkdirs());

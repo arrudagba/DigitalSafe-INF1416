@@ -1,11 +1,11 @@
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.IntStream;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
-//
-// Senha pessoal: regras de formacao, armazenamento bcrypt e verificacao a partir
-// do teclado virtual numerico sobrecarregado
 public final class Senha {
 
     public static final String VERSAO_BCRYPT = "2y";
@@ -16,9 +16,6 @@ public final class Senha {
     private Senha() {
     }
 
-    //
-    // senhas pessoais sao formadas por oito, nove ou dez digitos de 0 a 9 e nao
-    // podem ter sequencias de numeros repetidos (o mesmo digito em seguida)
     public static boolean formatoValido(char[] senha) {
         if (senha == null || senha.length < TAMANHO_MIN || senha.length > TAMANHO_MAX) {
             return false;
@@ -34,8 +31,6 @@ public final class Senha {
         return true;
     }
 
-    //
-    // Valor_Armazenado = $2y$08$BASE64(salt)BASE64(hash) (60 caracteres)
     public static String gerarHash(char[] senha) {
         byte[] salt = new byte[16];
         new SecureRandom().nextBytes(salt);
@@ -50,10 +45,6 @@ public final class Senha {
         }
     }
 
-    //
-    // Cada botao pressionado no teclado sobrecarregado fornece um par de digitos.
-    // Testa as combinacoes possiveis (uma escolha por par) contra o hash bcrypt e
-    // retorna a senha encontrada, ou null se nenhuma combinacao for a senha.
     public static char[] descobrir(final String hashArmazenado, List<char[]> pares) {
         final int n = pares.size();
         if (n < TAMANHO_MIN || n > TAMANHO_MAX) {
@@ -63,7 +54,7 @@ public final class Senha {
         OptionalInt encontrada = IntStream.range(0, 1 << n).parallel().filter(mascara -> {
             char[] candidata = candidata(p, mascara);
             try {
-                // senhas validas nunca tem digitos repetidos em sequencia
+                // senha nao repete digito em sequencia
                 return formatoValido(candidata) && verificar(hashArmazenado, candidata);
             } finally {
                 Arrays.fill(candidata, '\0');

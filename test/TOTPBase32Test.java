@@ -1,21 +1,18 @@
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 import static org.junit.Assert.*;
 
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import org.junit.*;
 
-//
-// Classe BASE32 (RFC 4648) e classe TOTP (RFC 4226 e RFC 6238)
 public class TOTPBase32Test {
 
-    // segredo do RFC 6238 (apendice B): "12345678901234567890" em BASE32
+    // "12345678901234567890" (RFC 6238)
     private static final String SEGREDO_RFC = "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ";
 
     private final Base32 base32 = new Base32(Base32.Alphabet.BASE32, false, false);
-
-    // =====================================================================
-    // BASE32
-    // =====================================================================
 
     @Test
     public void base32VetoresDoRfc4648() {
@@ -48,14 +45,10 @@ public class TOTPBase32Test {
         assertArrayEquals(segredo, base32.fromString(codificado));
     }
 
-    // =====================================================================
-    // TOTP
-    // =====================================================================
-
     @Test
     public void vetoresDoRfc6238ComSeisAlgarismos() throws Exception {
         TOTP totp = new TOTP(SEGREDO_RFC, 30);
-        // codigos de 8 digitos do RFC 6238 (SHA1), truncados nos 6 ultimos algarismos
+        // RFC 6238 (SHA1), ultimos 6 digitos
         long[] tempos = {59L, 1111111109L, 1111111111L, 1234567890L, 2000000000L, 20000000000L};
         String[] codigos = {"287082", "081804", "050471", "005924", "279037", "353130"};
         for (int i = 0; i < tempos.length; i++) {
@@ -134,16 +127,12 @@ public class TOTPBase32Test {
         new TOTP(SEGREDO_RFC, 0);
     }
 
-    //
-    // chama o metodo privado TOTPCode(long) da estrutura definida no enunciado
     static String codigo(TOTP totp, long intervalo) throws Exception {
         Method m = TOTP.class.getDeclaredMethod("TOTPCode", long.class);
         m.setAccessible(true);
         return (String) m.invoke(totp, intervalo);
     }
 
-    //
-    // intervalo atual, aguardando se estiver no limite de uma troca de intervalo
     static long intervaloSeguro() throws InterruptedException {
         long segundos = System.currentTimeMillis() / 1000;
         if (segundos % 30 >= 28) {

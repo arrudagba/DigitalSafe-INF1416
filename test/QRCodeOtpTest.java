@@ -1,3 +1,6 @@
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 import static org.junit.Assert.*;
 
 import java.awt.image.BufferedImage;
@@ -6,9 +9,6 @@ import com.google.zxing.*;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
 
-//
-// QRCode da URI otpauth para o cadastro no Google Authenticator: a imagem gerada
-// eh decodificada de volta e deve conter exatamente a URI do usuario
 public class QRCodeOtpTest {
 
     @Test
@@ -24,7 +24,7 @@ public class QRCodeOtpTest {
             Cadastro.Confirmacao conf = c.cadastrar(c.p().admin, Cenario.SENHA_ADMIN, Usuario.GID_ADMINISTRADOR, null);
             String lida = ler(QRCodeOtp.gerar(conf.uriOtpAuth, 260));
             assertEquals(conf.uriOtpAuth, lida);
-            // o aplicativo extrai o segredo do parametro secret da URI lida
+            // segredo do parametro secret
             String segredo = lida.substring(lida.indexOf("secret=") + 7);
             assertEquals(conf.segredoTotpBase32, segredo);
             assertTrue(new TOTP(c.segredos.get(GeradorPacote.ADMIN), 30).validateCode(new TOTP(segredo, 30).generateCode()));

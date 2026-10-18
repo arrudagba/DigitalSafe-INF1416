@@ -1,6 +1,6 @@
-//
-// Ferramenta de apoio (nao faz parte do Cofre Digital): mostra o codigo TOTP atual
-// de uma chave secreta BASE32, como o Google Authenticator faria.
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 public class GerarToken {
 
     public static void main(String[] args) throws Exception {

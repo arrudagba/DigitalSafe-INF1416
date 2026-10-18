@@ -1,12 +1,10 @@
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 import java.sql.SQLException;
 import java.util.*;
 import java.util.function.LongSupplier;
 
-//
-// Processo de autenticacao multifator em tres etapas:
-//   1 - identificacao (login name)
-//   2 - senha pessoal (algo que o usuario conhece), via teclado virtual sobrecarregado
-//   3 - token TOTP do Google Authenticator (algo que o usuario possui)
 public class Autenticacao {
 
     public static final long TEMPO_BLOQUEIO_MS = 2 * 60 * 1000;
@@ -15,13 +13,13 @@ public class Autenticacao {
     public enum Etapa { IDENTIFICACAO, SENHA, TOKEN, AUTENTICADO }
 
     public enum Resultado {
-        LIBERADO,           // etapa 1: segue para a etapa 2
-        NAO_IDENTIFICADO,   // etapa 1: login name invalido, permanece na etapa 1
-        BLOQUEADO,          // acesso bloqueado: (volta para a / permanece na) etapa 1
-        SENHA_OK,           // etapa 2: segue para a etapa 3
-        SENHA_INVALIDA,     // etapa 2: erro contabilizado, permanece na etapa 2
-        TOKEN_OK,           // etapa 3: acesso permitido
-        TOKEN_INVALIDO      // etapa 3: erro contabilizado, volta ao inicio da etapa 3
+        LIBERADO,
+        NAO_IDENTIFICADO,
+        BLOQUEADO,
+        SENHA_OK,
+        SENHA_INVALIDA,
+        TOKEN_OK,
+        TOKEN_INVALIDO
     }
 
     private static final int[] ERROS_SENHA = {Mensagens.SENHA_ERRO1, Mensagens.SENHA_ERRO2, Mensagens.SENHA_ERRO3};
@@ -49,17 +47,11 @@ public class Autenticacao {
         return usuario;
     }
 
-    //
-    // inicio do processo de autenticacao (primeira etapa)
     public void iniciar() {
         limpar();
         etapa = Etapa.IDENTIFICACAO;
         log.registrar(Mensagens.ETAPA1_INICIADA);
     }
-
-    // =====================================================================
-    // Etapa 1: identificacao do usuario
-    // =====================================================================
 
     public Resultado identificar(String loginName) throws SQLException {
         exigirEtapa(Etapa.IDENTIFICACAO);
@@ -80,10 +72,6 @@ public class Autenticacao {
         log.registrar(Mensagens.ETAPA2_INICIADA, usuario);
         return Resultado.LIBERADO;
     }
-
-    // =====================================================================
-    // Etapa 2: senha pessoal fornecida pelo teclado virtual sobrecarregado
-    // =====================================================================
 
     public Resultado verificarSenha(List<char[]> paresPressionados) throws SQLException {
         exigirEtapa(Etapa.SENHA);
@@ -108,10 +96,6 @@ public class Autenticacao {
         usuario.errosSenha = erros;
         return Resultado.SENHA_INVALIDA;
     }
-
-    // =====================================================================
-    // Etapa 3: token TOTP
-    // =====================================================================
 
     public Resultado verificarToken(String codigo) throws SQLException {
         exigirEtapa(Etapa.TOKEN);
@@ -138,9 +122,6 @@ public class Autenticacao {
         return Resultado.TOKEN_INVALIDO;
     }
 
-    //
-    // a chave secreta TOTP (BASE32) esta cifrada com AES/ECB/PKCS5Padding e chave
-    // gerada a partir da senha pessoal verificada na etapa 2
     private boolean tokenValido(String codigo) {
         try {
             byte[] base32 = CriptoUtil.decifrarAES(CriptoUtil.chaveAES(senhaVerificada), usuario.chaveTotp);
@@ -154,9 +135,6 @@ public class Autenticacao {
         }
     }
 
-    //
-    // terceiro erro consecutivo: bloqueia o acesso do usuario por 2 minutos e
-    // retorna para a primeira etapa
     private void bloquear(int midBloqueio, int midEtapaEncerrada) throws SQLException {
         banco.bloquear(usuario.uid, relogio.getAsLong() + TEMPO_BLOQUEIO_MS);
         log.registrar(midBloqueio, usuario);
@@ -177,8 +155,6 @@ public class Autenticacao {
         }
     }
 
-    //
-    // apaga os dados da tentativa de autenticacao (inclusive a senha da memoria)
     public void limpar() {
         apagarSenha();
         usuario = null;

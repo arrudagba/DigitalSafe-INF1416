@@ -1,5 +1,6 @@
-//
-// Registro de um usuario da tabela Usuarios
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 public class Usuario {
 
     public static final int GID_ADMINISTRADOR = 1;

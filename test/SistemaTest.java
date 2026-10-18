@@ -1,11 +1,11 @@
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 import static org.junit.Assert.*;
 
 import java.io.File;
 import org.junit.*;
 
-//
-// Processo de partida do sistema, frase secreta do administrador em memoria,
-// navegacao entre as telas e encerramento
 public class SistemaTest {
 
     private Cenario c;
@@ -19,10 +19,6 @@ public class SistemaTest {
     public void depois() throws Exception {
         c.close();
     }
-
-    // =====================================================================
-    // Partida
-    // =====================================================================
 
     @Test
     public void primeiraPartidaIniciaOCadastroDoAdministrador() throws Exception {
@@ -87,10 +83,6 @@ public class SistemaTest {
         c.sistema.encerrar();
         assertEquals(Cenario.lista(Mensagens.SISTEMA_ENCERRADO), c.mids(m));
     }
-
-    // =====================================================================
-    // Telas e menus
-    // =====================================================================
 
     @Test
     public void navegacaoDoMenuPrincipalRegistraCadaTela() throws Exception {

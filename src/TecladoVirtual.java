@@ -1,10 +1,9 @@
+// Gabriel de Barros Arruda - 2311723
+// Erica Oliveira Regnier - 2211893
+
 import java.security.SecureRandom;
 import java.util.*;
 
-//
-// Teclado virtual numerico sobrecarregado: cinco botoes, cada um com dois numeros
-// distribuidos aleatoriamente e sem repeticao. A cada pressionamento os numeros
-// sao redistribuidos entre os botoes.
 public class TecladoVirtual {
 
     public static final int BOTOES = 5;
@@ -22,8 +21,6 @@ public class TecladoVirtual {
         embaralhar();
     }
 
-    //
-    // distribui os digitos 0..9 aleatoriamente entre os botoes (Fisher-Yates)
     public final void embaralhar() {
         char[] digitos = "0123456789".toCharArray();
         for (int i = digitos.length - 1; i > 0; i--) {
@@ -47,8 +44,6 @@ public class TecladoVirtual {
         return botoes[indice][0] + " ou " + botoes[indice][1];
     }
 
-    //
-    // registra o par de digitos do botao pressionado e redistribui os numeros
     public boolean pressionar(int indice) {
         if (pressionados.size() >= Senha.TAMANHO_MAX) {
             return false;
